@@ -54,9 +54,33 @@ export class Lexer {
     this.skipWhitespace();
 
     switch (this.ch) {
+      // Operators.
       case "=":
         tok = createToken(TokenType.ASSIGN, this.ch);
         break;
+      case "+":
+        tok = createToken(TokenType.PLUS, this.ch);
+        break;
+      case "-":
+        tok = createToken(TokenType.MINUS, this.ch);
+        break;
+      case "!":
+        tok = createToken(TokenType.BANG, this.ch);
+        break;
+      case "/":
+        tok = createToken(TokenType.SLASH, this.ch);
+        break;
+      case "*":
+        tok = createToken(TokenType.ASTERISK, this.ch);
+        break;
+      case "<":
+        tok = createToken(TokenType.LT, this.ch);
+        break;
+      case ">":
+        tok = createToken(TokenType.GT, this.ch);
+        break;
+
+      // Delimiters.
       case ";":
         tok = createToken(TokenType.SEMICOLON, this.ch);
         break;

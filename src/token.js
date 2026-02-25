@@ -9,6 +9,13 @@ export const TokenType = Object.freeze({
   // Operators.
   ASSIGN: "=",
   PLUS: "+",
+  MINUS: "-",
+  BANG: "!",
+  ASTERISK: "*",
+  SLASH: "/",
+
+  LT: "<",
+  GT: ">",
 
   // Delimiters.
   COMMA: ",",
