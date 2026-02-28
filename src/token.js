@@ -29,11 +29,24 @@ export const TokenType = Object.freeze({
   // Keywords.
   FUNCTION: "FUNCTION",
   LET: "LET",
+  TRUE: "TRUE",
+  FALSE: "FALSE",
+  IF: "IF",
+  ELSE: "ELSE",
+  RETURN: "RETURN",
+
+  EQ: "==",
+  NOT_EQ: "!=",
 });
 
 const Keywords = Object.freeze({
   fn: TokenType.FUNCTION,
   let: TokenType.LET,
+  true: TokenType.TRUE,
+  false: TokenType.FALSE,
+  if: TokenType.IF,
+  else: TokenType.ELSE,
+  return: TokenType.RETURN,
 });
 
 export class Token {

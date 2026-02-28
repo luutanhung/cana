@@ -1,4 +1,4 @@
-import { createToken, lookupIdent, TokenType } from "./token";
+import { createToken, lookupIdent, TokenType } from "./token.js";
 
 function isLetter(ch) {
   return /^[a-zA-Z_]$/.test(ch);
@@ -14,6 +14,7 @@ export class Lexer {
     this.position = 0;
     this.readPosition = 0;
     this.ch = null;
+    this.readChar();
   }
 
   readChar() {
@@ -24,6 +25,14 @@ export class Lexer {
     }
     this.position = this.readPosition;
     this.readPosition += 1;
+  }
+
+  peekChar() {
+    if (this.readPosition >= this.input.length) {
+      return 0;
+    } else {
+      return this.input[this.readPosition];
+    }
   }
 
   readIdentifier() {
@@ -56,7 +65,13 @@ export class Lexer {
     switch (this.ch) {
       // Operators.
       case "=":
-        tok = createToken(TokenType.ASSIGN, this.ch);
+        if (this.peekChar() === "=") {
+          const ch = l.ch;
+          this.readChar();
+          tok = createToken(TokenType.EQ, ch + this.ch);
+        } else {
+          tok = createToken(TokenType.ASSIGN, this.ch);
+        }
         break;
       case "+":
         tok = createToken(TokenType.PLUS, this.ch);
@@ -65,7 +80,13 @@ export class Lexer {
         tok = createToken(TokenType.MINUS, this.ch);
         break;
       case "!":
-        tok = createToken(TokenType.BANG, this.ch);
+        if (this.peekChar() === "=") {
+          const ch = this.ch;
+          this.readChar();
+          tok = createToken(TokenType.NOT_EQ, ch + this.ch);
+        } else {
+          tok = createToken(TokenType.BANG, this.ch);
+        }
         break;
       case "/":
         tok = createToken(TokenType.SLASH, this.ch);
