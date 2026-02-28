@@ -1,10 +1,10 @@
 {
-  "name": "cana",
+  "name": "cook",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "cana": "node ./src/repl.js",
+    "cook": "node ./src/repl.js",
     "test": "vitest",
     "dev": "vite",
     "build": "vite build",

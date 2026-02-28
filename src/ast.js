@@ -45,6 +45,20 @@ export class Identifier extends Expression {
   }
 }
 
+export class ReturnStatement extends Statement {
+  constructor(token, returnValue) {
+    super();
+
+    this.token = token;
+    this.returnValue = returnValue;
+  }
+
+  statementNode() {}
+  tokenLiteral() {
+    return this.token.literal;
+  }
+}
+
 export class Program {
   constructor() {
     this.statements = [];

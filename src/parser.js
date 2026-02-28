@@ -1,14 +1,19 @@
-import { Identifier, LetStatement, Program } from "./ast.js";
+import { Identifier, LetStatement, Program, ReturnStatement } from "./ast.js";
 import { TokenType } from "./token.js";
 
 export class Parser {
   constructor(lexer) {
     this.l = lexer;
+    this.errors = [];
     this.curToken;
     this.peekToken;
 
     this.nextToken();
     this.nextToken();
+  }
+
+  errors() {
+    return this.errors;
   }
 
   nextToken() {
@@ -32,6 +37,8 @@ export class Parser {
     switch (this.curToken.type) {
       case TokenType.LET:
         return this.parseLetStatement();
+      case TokenType.RETURN:
+        return this.parserReturnStatement();
       default:
         return null;
     }
@@ -57,6 +64,17 @@ export class Parser {
     return stmt;
   }
 
+  parserReturnStatement() {
+    const stmt = new ReturnStatement(this.curToken);
+    this.nextToken();
+
+    while (!this.curTokenIs(TokenType.SEMICOLON)) {
+      this.nextToken();
+    }
+
+    return stmt;
+  }
+
   curTokenIs(tokenType) {
     return this.curToken.type === tokenType;
   }
@@ -65,11 +83,17 @@ export class Parser {
     return this.peekToken.type === tokenType;
   }
 
+  peekError(tokenType) {
+    const msg = `expected next token to be ${tokenType}, got ${this.peekToken.type} instead.`;
+    this.errors.push(msg);
+  }
+
   expectPeek(tokenType) {
     if (this.peekTokenIs(tokenType)) {
       this.nextToken();
       return true;
     } else {
+      this.peekError(tokenType);
       return false;
     }
   }
