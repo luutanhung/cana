@@ -1,6 +1,7 @@
 import readline from "readline";
 import { Lexer } from "./lexer.js";
 import { TokenType } from "./token.js";
+import { Parser } from "./parser.js";
 
 const PROMPT = ">> ";
 
@@ -15,13 +16,9 @@ export function start() {
 
   rl.on("line", (line) => {
     const lexer = new Lexer(line);
-    for (
-      let tok = lexer.nextToken();
-      tok.type !== TokenType.EOF;
-      tok = lexer.nextToken()
-    ) {
-      console.log(tok);
-    }
+    const parser = new Parser(lexer);
+    const program = parser.parseProgram();
+    console.log(program.statements);
 
     rl.prompt();
   });
