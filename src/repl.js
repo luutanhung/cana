@@ -2,6 +2,7 @@ import readline from "readline";
 import { Lexer } from "./lexer.js";
 import { TokenType } from "./token.js";
 import { Parser } from "./parser.js";
+import { evaluate } from "./evaluator.js";
 
 const PROMPT = ">> ";
 
@@ -24,6 +25,11 @@ export function start() {
       printParseErrors(errors);
     } else {
       console.log(program.statements[0].string());
+    }
+
+    const evaluated = evaluate(program);
+    if (evaluated) {
+      console.log(`${evaluated.inspect()}\n`);
     }
 
     rl.prompt();
