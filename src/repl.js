@@ -19,7 +19,10 @@ export function start() {
     // console.log(lexer.getTokenList());
     const parser = new Parser(lexer);
     const program = parser.parseProgram();
-    if (program.statements.length > 0) {
+    const errors = parser.errors;
+    if (errors.length > 0) {
+      printParseErrors(errors);
+    } else {
       console.log(program.statements[0].string());
     }
 
@@ -29,6 +32,12 @@ export function start() {
   rl.on("close", () => {
     process.exit(0);
   });
+}
+
+function printParseErrors(errors) {
+  for (const error of errors) {
+    console.log(error);
+  }
 }
 
 start();

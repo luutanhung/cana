@@ -302,3 +302,35 @@ export class FunctionLiteral extends Expression {
     return out;
   }
 }
+
+export class CallExpression extends Expression {
+  constructor(token, functionLiteral, args) {
+    super();
+
+    this.token = token;
+    this.function = functionLiteral;
+    this.arguments = args;
+  }
+
+  expressionNode() {}
+  tokenLiteral() {
+    return this.token.literal;
+  }
+
+  string() {
+    let out = "";
+    if (this.function.string) {
+      out += this.function.string();
+    }
+    out += "(";
+    for (let arg of this.arguments) {
+      out += arg.string();
+      out += ", ";
+    }
+    if (this.arguments.length > 0) {
+      out = out.slice(0, -2);
+    }
+    out += ")";
+    return out;
+  }
+}

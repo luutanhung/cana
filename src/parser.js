@@ -2,6 +2,7 @@ import { createLogger } from "vite";
 import {
   BlockStatement,
   Boolean,
+  CallExpression,
   ExpressionStatement,
   FunctionLiteral,
   Identifier,
@@ -34,6 +35,7 @@ export const precedences = new Map([
   [TokenType.MINUS, Precedence.SUM],
   [TokenType.SLASH, Precedence.PRODUCT],
   [TokenType.ASTERISK, Precedence.PRODUCT],
+  [TokenType.LPAREN, Precedence.CALL],
 ]);
 /**
  * type PrefixParseFunc = () => Expression;
@@ -76,6 +78,7 @@ export class Parser {
     this.registerInfix(TokenType.NOT_EQ, this.parseInfixExpression.bind(this));
     this.registerInfix(TokenType.LT, this.parseInfixExpression.bind(this));
     this.registerInfix(TokenType.GT, this.parseInfixExpression.bind(this));
+    this.registerInfix(TokenType.LPAREN, this.parseCallExpression.bind(this));
 
     this.nextToken();
     this.nextToken();
@@ -147,8 +150,10 @@ export class Parser {
       return null;
     }
 
-    while (!this.curTokenIs(TokenType.SEMICOLON)) {
-      this.nextToken();
+    this.nextToken();
+    stmt.value = this.parseExpression(LOWEST);
+    if (this.peekTokenIs(TokenType.SEMICOLON)) {
+      this.peekToken();
     }
 
     return stmt;
@@ -158,7 +163,8 @@ export class Parser {
     const stmt = new ReturnStatement(this.curToken);
     this.nextToken();
 
-    while (!this.curTokenIs(TokenType.SEMICOLON)) {
+    stmt.returnValue = this.parseExpression(LOWEST);
+    if (this.peekTokenIs(TokenType.SEMICOLON)) {
       this.nextToken();
     }
 
@@ -367,5 +373,30 @@ export class Parser {
     }
 
     return identifers;
+  }
+
+  parseCallExpression(func) {
+    const exp = new CallExpression(this.curToken, func);
+    exp.arguments = this.parseCallArguments();
+    return exp;
+  }
+
+  parseCallArguments() {
+    const args = [];
+    if (this.peekTokenIs(TokenType.RPAREN)) {
+      this.nextToken();
+      return args;
+    }
+    this.nextToken();
+    args.push(this.parseExpression(Precedence.LOWEST));
+    while (this.peekTokenIs(TokenType.COMMA)) {
+      this.nextToken();
+      this.nextToken();
+      args.push(this.parseExpression(Precedence.LOWEST));
+    }
+    if (!this.expectPeek(TokenType.RPAREN)) {
+      return null;
+    }
+    return args;
   }
 }
