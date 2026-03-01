@@ -271,3 +271,34 @@ export class Program extends Node {
 
   string() {}
 }
+
+export class FunctionLiteral extends Expression {
+  constructor(token, parameters = [], body) {
+    super();
+
+    this.token = token;
+    this.parameters = parameters;
+    this.body = body;
+  }
+
+  expressionNode() {}
+  tokenLiteral() {
+    return this.token.literal;
+  }
+
+  string() {
+    let out = "fn(";
+    for (let param of this.parameters) {
+      out += param.string();
+      out += ", ";
+    }
+    if (this.parameters.length > 0) {
+      out = out.slice(0, -2);
+    }
+    out += ") ";
+    if (this.body.string) {
+      out += this.body.string();
+    }
+    return out;
+  }
+}
