@@ -16,9 +16,12 @@ export function start() {
 
   rl.on("line", (line) => {
     const lexer = new Lexer(line);
+    // console.log(lexer.getTokenList());
     const parser = new Parser(lexer);
     const program = parser.parseProgram();
-    console.log(program.statements);
+    if (program.statements.length > 0) {
+      console.log(program.statements[0].string());
+    }
 
     rl.prompt();
   });

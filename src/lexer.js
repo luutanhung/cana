@@ -66,7 +66,7 @@ export class Lexer {
       // Operators.
       case "=":
         if (this.peekChar() === "=") {
-          const ch = l.ch;
+          const ch = this.ch;
           this.readChar();
           tok = createToken(TokenType.EQ, ch + this.ch);
         } else {
@@ -145,5 +145,14 @@ export class Lexer {
 
     this.readChar();
     return tok;
+  }
+
+  getTokenList() {
+    const tokens = [];
+    let tok;
+    while ((tok = this.nextToken())) {
+      tokens.push(tok);
+    }
+    return tokens;
   }
 }
