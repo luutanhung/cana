@@ -16,14 +16,11 @@ export function start() {
 
   rl.on("line", (line) => {
     const lexer = new Lexer(line);
-    // console.log(lexer.getTokenList());
     const parser = new Parser(lexer);
     const program = parser.parseProgram();
     const errors = parser.errors;
     if (errors.length > 0) {
       printParseErrors(errors);
-    } else {
-      console.log(program.statements[0].string());
     }
 
     const evaluated = evaluate(program);

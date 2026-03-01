@@ -2,13 +2,23 @@ import {
   Boolean as AstBoolean,
   ExpressionStatement,
   IntegerLiteral,
+  PrefixExpression,
   Program,
 } from "./ast.js";
-import { Integer, Boolean as BooleanObject } from "./object.js";
+import {
+  BooleanObject,
+  IntegerObject,
+  NullObject,
+  ObjectType,
+} from "./object.js";
+
+const TRUE = new BooleanObject(true);
+const FALSE = new BooleanObject(false);
+const NULL = new NullObject();
 
 export function evaluate(node) {
   if (node instanceof Program) {
-    evalStatements(node.statements);
+    return evalStatements(node.statements);
   }
 
   if (node instanceof ExpressionStatement) {
@@ -16,11 +26,16 @@ export function evaluate(node) {
   }
 
   if (node instanceof IntegerLiteral) {
-    return new Integer(node.value);
+    return new IntegerObject(node.value);
   }
 
   if (node instanceof AstBoolean) {
-    return new BooleanObject(node.value);
+    return nativeBoolToBooleanObject(node.value);
+  }
+
+  if (node instanceof PrefixExpression) {
+    const right = evaluate(node.right);
+    return evalPrefixExpression(node.operator, right);
   }
 
   return null;
@@ -32,4 +47,51 @@ function evalStatements(stmts) {
     result = evaluate(stmt);
   }
   return result;
+}
+
+function nativeBoolToBooleanObject(input) {
+  if (input) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+function evalPrefixExpression(operator, right) {
+  switch (operator) {
+    case "!":
+      return evalBangOperatorExpression(right);
+    case "-":
+      return evalMinusOperatorExpression(right);
+    default:
+      return null;
+  }
+}
+
+function evalBangOperatorExpression(right) {
+  let res = FALSE;
+  switch (right) {
+    case TRUE:
+      res = FALSE;
+      break;
+    case FALSE:
+      res = TRUE;
+      break;
+    case NULL:
+      res = TRUE;
+      break;
+    default:
+      res = FALSE;
+      break;
+  }
+  return res;
+}
+
+function evalMinusOperatorExpression(right) {
+  if (right.type() !== ObjectType.INTEGER_OBJ) {
+    return NULL;
+  }
+
+  const value = right.value;
+  return new IntegerObject(-value);
 }

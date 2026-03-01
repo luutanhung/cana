@@ -12,7 +12,7 @@ class ObjectWrapper {
   inspect() {}
 }
 
-export class Integer extends ObjectWrapper {
+export class IntegerObject extends ObjectWrapper {
   constructor(value) {
     super();
 
@@ -28,7 +28,7 @@ export class Integer extends ObjectWrapper {
   }
 }
 
-export class Boolean extends ObjectWrapper {
+export class BooleanObject extends ObjectWrapper {
   constructor(value) {
     super();
     this.value = value;
@@ -43,7 +43,7 @@ export class Boolean extends ObjectWrapper {
   }
 }
 
-export class Null extends ObjectWrapper {
+export class NullObject extends ObjectWrapper {
   constructor() {
     super();
   }
