@@ -1,7 +1,10 @@
 import { createLogger } from "vite";
 import {
+  BlockStatement,
+  Boolean,
   ExpressionStatement,
   Identifier,
+  IfExpression,
   InfixExpression,
   IntegerLiteral,
   LetStatement,
@@ -9,7 +12,7 @@ import {
   Program,
   ReturnStatement,
 } from "./ast.js";
-import { TokenType } from "./token.js";
+import { Token, TokenType } from "./token.js";
 
 export const Precedence = Object.freeze({
   LOWEST: 1,
@@ -49,6 +52,13 @@ export class Parser {
     this.registerPrefix(TokenType.INT, this.parseIntegerLiteral.bind(this));
     this.registerPrefix(TokenType.BANG, this.parsePrefixExpression.bind(this));
     this.registerPrefix(TokenType.MINUS, this.parsePrefixExpression.bind(this));
+    this.registerPrefix(TokenType.TRUE, this.parseBoolean.bind(this));
+    this.registerPrefix(TokenType.FALSE, this.parseBoolean.bind(this));
+    this.registerPrefix(
+      TokenType.LPAREN,
+      this.parseGroupedExpression.bind(this),
+    );
+    this.registerPrefix(TokenType.IF, this.parseIfExpression.bind(this));
 
     this.registerInfix(TokenType.PLUS, this.parseInfixExpression.bind(this));
     this.registerInfix(TokenType.MINUS, this.parseInfixExpression.bind(this));
@@ -252,5 +262,60 @@ export class Parser {
     this.nextToken();
     expression.right = this.parseExpression(precedence);
     return expression;
+  }
+
+  parseBoolean() {
+    return new Boolean(this.curToken, this.curTokenIs(TokenType.TRUE));
+  }
+
+  parseGroupedExpression() {
+    this.nextToken();
+    const exp = this.parseExpression(Precedence.LOWEST);
+    if (!this.expectPeek(TokenType.LPAREN)) {
+      return null;
+    }
+    return exp;
+  }
+
+  parseIfExpression() {
+    const expression = new IfExpression(this.curToken);
+    if (!this.expectPeek(TokenType.LPAREN)) {
+      return null;
+    }
+    this.nextToken();
+    expression.condition = this.parseExpression(Precedence.LOWEST);
+    if (!this.expectPeek(TokenType.RPAREN)) {
+      return null;
+    }
+    if (!this.expectPeek(TokenType.LBRACE)) {
+      return null;
+    }
+
+    expression.consequence = this.parseBlockStatement();
+
+    if (this.peekTokenIs(TokenType.ELSE)) {
+      this.nextToken();
+      if (!this.expectPeek(TokenType.LBRACE)) {
+        return null;
+      }
+      expression.alternative = this.parseBlockStatement();
+    }
+    return expression;
+  }
+
+  parseBlockStatement() {
+    const block = new BlockStatement(this.curToken);
+    this.nextToken();
+    while (
+      !this.curTokenIs(TokenType.RBRACE) &&
+      !this.curTokenIs(TokenType.EOF)
+    ) {
+      const stmt = this.parseStatement();
+      if (stmt) {
+        block.statements.push(stmt);
+      }
+      this.nextToken();
+    }
+    return block;
   }
 }

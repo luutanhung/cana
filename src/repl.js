@@ -20,6 +20,7 @@ export function start() {
     const parser = new Parser(lexer);
     const program = parser.parseProgram();
     if (program.statements.length > 0) {
+      console.log(program.statements);
       console.log(program.statements[0].string());
     }
 

@@ -186,6 +186,75 @@ export class InfixExpression extends Expression {
   }
 }
 
+export class Boolean extends Expression {
+  constructor(token, value) {
+    this.token = token;
+    this.value = value;
+  }
+
+  expressionNode() {}
+  tokenLiteral() {
+    return this.token.literal;
+  }
+  string() {
+    return this.token.literal;
+  }
+}
+
+export class BlockStatement extends Statement {
+  constructor(token, statements = []) {
+    super();
+
+    this.token = token;
+    this.statements = statements;
+  }
+
+  statementNode() {}
+  tokenLiteral() {
+    return this.token.literal;
+  }
+
+  string() {
+    let out = "";
+    for (let stmt of this.statements) {
+      out += stmt.string();
+    }
+    return out;
+  }
+}
+
+export class IfExpression extends Expression {
+  constructor(token, condition, consequence, alternative) {
+    super();
+
+    this.token = token;
+    this.condition = condition;
+    this.consequence = consequence;
+    this.alternative = alternative;
+  }
+
+  expressionNode() {}
+  tokenLiteral() {
+    return this.token.literal;
+  }
+
+  string() {
+    let out = "if ";
+    if (this.condition.string) {
+      out += this.condition.string();
+    }
+    out += " ";
+    if (this.consequence.string) {
+      out += this.consequence.string();
+    }
+    if (this.alternative.string) {
+      out += " else ";
+      out += this.alternative.string();
+    }
+    return out;
+  }
+}
+
 export class Program extends Node {
   constructor() {
     super();
